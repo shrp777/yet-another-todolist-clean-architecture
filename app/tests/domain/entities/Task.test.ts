@@ -72,16 +72,4 @@ describe("Task Entity", () => {
     });
   });
 
-  describe("toDTO", () => {
-    test("returns the correct format { id, content, status }", () => {
-      const task = new Task("Write tests");
-      const dto = task.toDTO();
-
-      expect(dto).toEqual({
-        id: task.id,
-        content: "Write tests",
-        status: "TODO",
-      });
-    });
-  });
 });

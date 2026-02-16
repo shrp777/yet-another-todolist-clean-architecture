@@ -1,7 +1,4 @@
 import type { CreateTaskDTO } from "@application/dtos/CreateTaskDTO";
-import type { StartTaskDTO } from "@application/dtos/StartTaskDTO";
-import type { StopTaskDTO } from "@application/dtos/StopTaskDTO";
-import type { TaskResponse } from "@application/dtos/TaskResponse";
 import type { ICompleteTask } from "@application/ports/in/ICompleteTask";
 import type { ICreateTask } from "@application/ports/in/ICreateTask";
 import type { IFindTaskById } from "@application/ports/in/IFindTaskById";
@@ -53,19 +50,7 @@ export class ConsoleAdapter {
         if (!arg) {
           console.error("Missing task id");
         } else {
-          const existingTask: TaskResponse | null =
-            await this.findTaskByIdUseCase.execute(arg);
-          if (existingTask) {
-            const startTaskDTO: StartTaskDTO = {
-              id: existingTask.id,
-              content: existingTask.content,
-              status: existingTask.status
-            };
-            const startedTask = await this.startTaskUseCase.execute(startTaskDTO);
-            console.log(startedTask);
-          } else {
-            console.error(`Task ${arg} not found`);
-          }
+          console.log(await this.startTaskUseCase.execute({ id: arg }));
         }
         break;
 
@@ -73,19 +58,7 @@ export class ConsoleAdapter {
         if (!arg) {
           console.error("Missing task id");
         } else {
-          const existingTask: TaskResponse | null =
-            await this.findTaskByIdUseCase.execute(arg);
-          if (existingTask) {
-            const stopTaskDTO: StopTaskDTO = {
-              id: existingTask.id,
-              content: existingTask.content,
-              status: existingTask.status
-            };
-            const stoppedTask = await this.stopTaskUseCase.execute(stopTaskDTO);
-            console.log(stoppedTask);
-          } else {
-            console.error(`Task ${arg} not found`);
-          }
+          console.log(await this.stopTaskUseCase.execute({ id: arg }));
         }
         break;
 

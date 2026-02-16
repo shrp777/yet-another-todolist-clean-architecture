@@ -1,6 +1,6 @@
-import type { StopTaskDTO } from "@application/dtos/StopTaskDTO";
+import type { TaskByIdDTO } from "@application/dtos/TaskByIdDTO";
 import type { TaskResponse } from "@application/dtos/TaskResponse";
 
 export interface IStopTask {
-  execute(task: StopTaskDTO): Promise<TaskResponse>;
+  execute(task: TaskByIdDTO): Promise<TaskResponse>;
 }

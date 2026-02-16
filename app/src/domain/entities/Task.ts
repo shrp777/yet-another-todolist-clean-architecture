@@ -1,8 +1,7 @@
-import type { TaskResponse } from "@application/dtos/TaskResponse";
 import type { TaskStatus } from "./TaskStatus";
 
 export class Task {
-  public readonly id?: string;
+  public readonly id: string;
 
   constructor(
     public content: string,
@@ -30,9 +29,5 @@ export class Task {
     if (this.status === "DOING") this.status = "TODO";
     else if (this.status === "TODO") throw new Error("Task is not started.");
     else throw new Error("Task is already done.");
-  }
-
-  toDTO(): TaskResponse {
-    return { id: this.id!, content: this.content, status: this.status };
   }
 }

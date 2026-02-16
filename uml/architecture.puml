@@ -6,10 +6,10 @@ skinparam linetype ortho
 skinparam nodesep 60
 skinparam ranksep 60
 
-title Clean Architecture - Todo List
+title Clean Architecture - Yet another To-do List
 
 ' ── Couche Infrastructure (Adapters) ──────────────────────────
-package "Infrastructure" as infra <<Frame>> #E8EAF6 {
+package "Infrastructure" as infra <<Layer>> #E8EAF6 {
 
   package "Adapter In\n(Driving)" as adapterIn #C5CAE9 {
     [ConsoleAdapter] as console
@@ -21,7 +21,7 @@ package "Infrastructure" as infra <<Frame>> #E8EAF6 {
 }
 
 ' ── Couche Application (Use Cases + Ports) ────────────────────
-package "Application" as app <<Frame>> #E8F5E9 {
+package "Application" as app <<Layer>> #E8F5E9 {
 
   package "Ports In\n(Input)" as portsIn #C8E6C9 {
     interface ICreateTask
@@ -48,15 +48,13 @@ package "Application" as app <<Frame>> #E8F5E9 {
   package "DTOs" as dtos #DCEDC8 {
     [CreateTaskDTO]
     [UpdateTaskDTO]
-    [CompleteTaskDTO]
-    [StartTaskDTO]
-    [StopTaskDTO]
+    [TaskByIdDTO]
     [TaskResponse]
   }
 }
 
 ' ── Couche Domain (Entities) ──────────────────────────────────
-package "Domain" as domain <<Frame>> #FFF3E0 {
+package "Domain" as domain <<Layer>> #FFF3E0 {
   package "Entities" as entities #FFE0B2 {
     [Task] as task
     [TaskStatus] as status
@@ -108,10 +106,10 @@ legend bottom right
   |<#E8F5E9>| Application (Use Cases, Ports, DTOs) |
   |<#E8EAF6>| Infrastructure (Adapters) |
   --
-  Les fleches pointent vers les dependances.
+  Les flêches pointent vers les dépendances.
   La **Dependency Inversion** est visible :
-  l adapter out (TaskRepository) implemente
-  l interface definie dans la couche Application.
+  l'adapter out (TaskRepository) implémente
+  l'interface définie dans la couche Application.
 end legend
 
 @enduml

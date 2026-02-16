@@ -5,10 +5,11 @@ import { FindTasks } from "@application/use-cases/FindTasks";
 import { StartTask } from "@application/use-cases/StartTask";
 import { StopTask } from "@application/use-cases/StopTask";
 import { ConsoleAdapter } from "@infrastructure/adapters/in/ConsoleAdapter";
-import { TaskRepository } from "@infrastructure/adapters/out/TaskRepository";
+import { InMemoryTaskRepository } from "@infrastructure/adapters/out/InMemoryTaskRepository";
 
-const repository = new TaskRepository();
+const repository = new InMemoryTaskRepository();
 
+//TODO: mettre en place un conteneur d'injection de dépendance
 const createTaskUseCase = new CreateTask(repository);
 const completeTaskUseCase = new CompleteTask(repository);
 const stopTaskUseCase = new StopTask(repository);

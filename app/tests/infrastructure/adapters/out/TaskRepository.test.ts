@@ -1,11 +1,11 @@
 import { describe, test, expect, beforeEach } from "bun:test";
-import { TaskRepository } from "@infrastructure/adapters/out/TaskRepository";
+import { InMemoryTaskRepository } from "@infrastructure/adapters/out/InMemoryTaskRepository";
 
-describe("TaskRepository (in-memory)", () => {
-  let repository: TaskRepository;
+describe("InMemoryTaskRepository", () => {
+  let repository: InMemoryTaskRepository;
 
   beforeEach(() => {
-    repository = new TaskRepository();
+    repository = new InMemoryTaskRepository();
   });
 
   describe("create", () => {
@@ -38,7 +38,7 @@ describe("TaskRepository (in-memory)", () => {
     test("returns the task when found", async () => {
       const created = await repository.create({ content: "Find me" });
 
-      const found = await repository.findOneById(created.id!);
+      const found = await repository.findOneById(created.id);
 
       expect(found).not.toBeNull();
       expect(found!.content).toBe("Find me");
@@ -55,9 +55,9 @@ describe("TaskRepository (in-memory)", () => {
       const created = await repository.create({ content: "Old content" });
 
       const updated = await repository.update({
-        id: created.id!,
+        id: created.id,
         content: "New content",
-        status: "DOING",
+        status: "DOING"
       });
 
       expect(updated.content).toBe("New content");
@@ -75,10 +75,10 @@ describe("TaskRepository (in-memory)", () => {
     test("removes a task", async () => {
       const created = await repository.create({ content: "Delete me" });
 
-      const result = await repository.remove(created.id!);
+      const result = await repository.remove(created.id);
 
       expect(result).toBe(true);
-      const found = await repository.findOneById(created.id!);
+      const found = await repository.findOneById(created.id);
       expect(found).toBeNull();
     });
   });

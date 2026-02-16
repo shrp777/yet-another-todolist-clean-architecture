@@ -23,13 +23,9 @@ describe("StopTask Use Case", () => {
     const repository = createMockRepository(task);
     const useCase = new StopTask(repository);
 
-    const result = await useCase.execute({
-      id: task.id!,
-      content: task.content,
-      status: task.status,
-    });
+    const result = await useCase.execute({ id: task.id });
 
-    expect(repository.findOneById).toHaveBeenCalledWith(task.id!);
+    expect(repository.findOneById).toHaveBeenCalledWith(task.id);
     expect(repository.update).toHaveBeenCalled();
     expect(result.status).toBe("TODO");
   });
@@ -39,7 +35,7 @@ describe("StopTask Use Case", () => {
     const useCase = new StopTask(repository);
 
     expect(
-      useCase.execute({ id: "unknown", content: "x", status: "DOING" })
+      useCase.execute({ id: "unknown" })
     ).rejects.toThrow("Task unknown not found");
   });
 });

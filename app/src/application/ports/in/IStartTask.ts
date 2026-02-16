@@ -1,7 +1,6 @@
-import type { StartTaskDTO } from "@application/dtos/StartTaskDTO";
+import type { TaskByIdDTO } from "@application/dtos/TaskByIdDTO";
 import type { TaskResponse } from "@application/dtos/TaskResponse";
-import type { Task } from "@domain/entities/Task";
 
 export interface IStartTask {
-  execute(task: StartTaskDTO): Promise<TaskResponse>;
+  execute(task: TaskByIdDTO): Promise<TaskResponse>;
 }

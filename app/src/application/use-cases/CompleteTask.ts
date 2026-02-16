@@ -1,4 +1,4 @@
-import type { CompleteTaskDTO } from "@application/dtos/CompleteTaskDTO";
+import type { TaskByIdDTO } from "@application/dtos/TaskByIdDTO";
 import type { TaskResponse } from "@application/dtos/TaskResponse";
 import type { UpdateTaskDTO } from "@application/dtos/UpdateTaskDTO";
 import type { ICompleteTask } from "@application/ports/in/ICompleteTask";
@@ -6,21 +6,19 @@ import type { ITaskRepository } from "@application/ports/out/ITaskRepository";
 import type { Task } from "@domain/entities/Task";
 
 export class CompleteTask implements ICompleteTask {
-  constructor(private readonly repository: ITaskRepository) {
-    this.repository = repository;
-  }
+  constructor(private readonly repository: ITaskRepository) {}
 
-  async execute(task: CompleteTaskDTO): Promise<TaskResponse> {
+  async execute(task: TaskByIdDTO): Promise<TaskResponse> {
     const foundTask: Task | null = await this.repository.findOneById(task.id);
     if (foundTask) {
       foundTask.markAsCompleted();
       const dto: UpdateTaskDTO = {
-        id: foundTask.id!,
+        id: foundTask.id,
         status: foundTask.status,
         content: foundTask.content
       };
       const updatedTask = await this.repository.update(dto);
-      return updatedTask.toDTO();
+      return { id: updatedTask.id, content: updatedTask.content, status: updatedTask.status };
     } else {
       throw Error(`Task ${task.id} not found`);
     }

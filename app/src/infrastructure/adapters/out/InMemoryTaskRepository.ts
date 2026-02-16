@@ -3,7 +3,7 @@ import type { UpdateTaskDTO } from "@application/dtos/UpdateTaskDTO";
 import type { ITaskRepository } from "@application/ports/out/ITaskRepository";
 import { Task } from "@domain/entities/Task";
 
-export class TaskRepository implements ITaskRepository {
+export class InMemoryTaskRepository implements ITaskRepository {
   private data: Array<Task> = [];
 
   async create(createTaskDTO: CreateTaskDTO): Promise<Task> {

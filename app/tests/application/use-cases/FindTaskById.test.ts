@@ -19,9 +19,9 @@ describe("FindTaskById Use Case", () => {
     const repository = createMockRepository(task);
     const useCase = new FindTaskById(repository);
 
-    const result = await useCase.execute(task.id!);
+    const result = await useCase.execute(task.id);
 
-    expect(repository.findOneById).toHaveBeenCalledWith(task.id!);
+    expect(repository.findOneById).toHaveBeenCalledWith(task.id);
     expect(result).toEqual({
       id: task.id,
       content: "Found task",
