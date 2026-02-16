@@ -8,6 +8,10 @@ Règles métier :
 - Le contenu est obligatoire et non vide.
 - Impossible de supprimer une tâche déjà marquée DONE.
 
+TODO: employer Tsyringe pour l'injection de dépendance automatisée
+TODO: programmer un adaptateur pour MariaDB (output)
+TODO: programmer un adaptateur pour une API REST (input)
+
   ![alt Diagramme UML d'architecture](uml/architecture.png)
 
   ![alt text](assets/yet-another-todolist.png)
