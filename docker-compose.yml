@@ -1,0 +1,52 @@
+name: "todolist"
+
+services:
+  app:
+    container_name: app
+    ports:
+      - "3000:3000"
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    env_file:
+      - ./app/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - todolist.net
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./app/src
+          target: /app/src
+        - action: rebuild
+          path: ./app/package.json
+
+  db:
+    container_name: db
+    image: mariadb
+    env_file:
+      - ./db/.env
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - todolist.net
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    ports:
+      - "8181:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - todolist.net
+
+networks:
+  todolist.net:
+    driver: bridge

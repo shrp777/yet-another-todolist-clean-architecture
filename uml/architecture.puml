@@ -1,0 +1,117 @@
+@startuml architecture
+!theme plain
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 60
+
+title Clean Architecture - Todo List
+
+' ── Couche Infrastructure (Adapters) ──────────────────────────
+package "Infrastructure" as infra <<Frame>> #E8EAF6 {
+
+  package "Adapter In\n(Driving)" as adapterIn #C5CAE9 {
+    [ConsoleAdapter] as console
+  }
+
+  package "Adapter Out\n(Driven)" as adapterOut #C5CAE9 {
+    [TaskRepository] as repo
+  }
+}
+
+' ── Couche Application (Use Cases + Ports) ────────────────────
+package "Application" as app <<Frame>> #E8F5E9 {
+
+  package "Ports In\n(Input)" as portsIn #C8E6C9 {
+    interface ICreateTask
+    interface IFindTasks
+    interface IFindTaskById
+    interface ICompleteTask
+    interface IStartTask
+    interface IStopTask
+  }
+
+  package "Use Cases" as usecases #A5D6A7 {
+    [CreateTask] as uc_create
+    [FindTasks] as uc_findAll
+    [FindTaskById] as uc_findOne
+    [CompleteTask] as uc_complete
+    [StartTask] as uc_start
+    [StopTask] as uc_stop
+  }
+
+  package "Ports Out\n(Output)" as portsOut #C8E6C9 {
+    interface ITaskRepository
+  }
+
+  package "DTOs" as dtos #DCEDC8 {
+    [CreateTaskDTO]
+    [UpdateTaskDTO]
+    [CompleteTaskDTO]
+    [StartTaskDTO]
+    [StopTaskDTO]
+    [TaskResponse]
+  }
+}
+
+' ── Couche Domain (Entities) ──────────────────────────────────
+package "Domain" as domain <<Frame>> #FFF3E0 {
+  package "Entities" as entities #FFE0B2 {
+    [Task] as task
+    [TaskStatus] as status
+  }
+}
+
+' ── Relations ─────────────────────────────────────────────────
+
+' Adapter In -> Ports In (depend des interfaces)
+console -down-> ICreateTask : <<uses>>
+console -down-> IFindTasks : <<uses>>
+console -down-> IFindTaskById : <<uses>>
+console -down-> ICompleteTask : <<uses>>
+console -down-> IStartTask : <<uses>>
+console -down-> IStopTask : <<uses>>
+
+' Use Cases implementent les Ports In
+uc_create -up-.|> ICreateTask : <<implements>>
+uc_findAll -up-.|> IFindTasks : <<implements>>
+uc_findOne -up-.|> IFindTaskById : <<implements>>
+uc_complete -up-.|> ICompleteTask : <<implements>>
+uc_start -up-.|> IStartTask : <<implements>>
+uc_stop -up-.|> IStopTask : <<implements>>
+
+' Use Cases -> Port Out (depend de l'interface)
+uc_create -down-> ITaskRepository : <<uses>>
+uc_findAll -down-> ITaskRepository : <<uses>>
+uc_findOne -down-> ITaskRepository : <<uses>>
+uc_complete -down-> ITaskRepository : <<uses>>
+uc_start -down-> ITaskRepository : <<uses>>
+uc_stop -down-> ITaskRepository : <<uses>>
+
+' Adapter Out implemente le Port Out (Dependency Inversion)
+repo -up-.|> ITaskRepository : <<implements>>
+
+' Use Cases -> Domain
+uc_create -down-> task : <<creates>>
+uc_complete -down-> task : <<mutates>>
+uc_start -down-> task : <<mutates>>
+uc_stop -down-> task : <<mutates>>
+
+' Domain interne
+task -right-> status : <<uses>>
+
+' ── Legende ───────────────────────────────────────────────────
+legend bottom right
+  | Couleur | Couche |
+  |<#FFF3E0>| Domain (Entities) |
+  |<#E8F5E9>| Application (Use Cases, Ports, DTOs) |
+  |<#E8EAF6>| Infrastructure (Adapters) |
+  --
+  Les fleches pointent vers les dependances.
+  La **Dependency Inversion** est visible :
+  l adapter out (TaskRepository) implemente
+  l interface definie dans la couche Application.
+end legend
+
+@enduml

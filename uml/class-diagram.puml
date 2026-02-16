@@ -1,0 +1,240 @@
+@startuml class-diagram
+!theme plain
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 40
+skinparam classAttributeIconSize 0
+
+title Diagramme de classes - Todo List Clean Architecture
+
+' ══════════════════════════════════════════════════════════════
+' DOMAIN
+' ══════════════════════════════════════════════════════════════
+package "domain" #FFF3E0 {
+
+  enum TaskStatus {
+    TODO
+    DOING
+    DONE
+  }
+
+  class Task {
+    + <<readonly>> id? : string
+    + content : string
+    + status : TaskStatus
+    --
+    + Task(content: string, status?: TaskStatus)
+    + markAsCompleted() : void
+    + start() : void
+    + stop() : void
+    + toDTO() : TaskResponse
+  }
+
+  Task --> TaskStatus
+}
+
+' ══════════════════════════════════════════════════════════════
+' APPLICATION - DTOs
+' ══════════════════════════════════════════════════════════════
+package "application" #E8F5E9 {
+
+  package "dtos" #DCEDC8 {
+
+    class CreateTaskDTO <<type>> {
+      + content : string
+    }
+
+    class UpdateTaskDTO <<type>> {
+      + id : string
+      + content : string
+      + status : TaskStatus
+    }
+
+    class CompleteTaskDTO <<type>> {
+      + id : string
+      + content : string
+      + status : TaskStatus
+    }
+
+    class StartTaskDTO <<type>> {
+      + id : string
+      + content : string
+      + status : TaskStatus
+    }
+
+    class StopTaskDTO <<type>> {
+      + id : string
+      + content : string
+      + status : TaskStatus
+    }
+
+    class TaskResponse <<type>> {
+      + id : string
+      + content : string
+      + status : TaskStatus
+    }
+  }
+
+  ' ════════════════════════════════════════════════════════════
+  ' APPLICATION - Ports In (Input)
+  ' ════════════════════════════════════════════════════════════
+  package "ports.in" #C8E6C9 {
+
+    interface ICreateTask {
+      + execute(task: CreateTaskDTO) : Promise<TaskResponse>
+    }
+
+    interface IFindTasks {
+      + execute() : Promise<TaskResponse[]>
+    }
+
+    interface IFindTaskById {
+      + execute(taskId: string) : Promise<TaskResponse | null>
+    }
+
+    interface ICompleteTask {
+      + execute(task: CompleteTaskDTO) : Promise<TaskResponse>
+    }
+
+    interface IStartTask {
+      + execute(task: StartTaskDTO) : Promise<TaskResponse>
+    }
+
+    interface IStopTask {
+      + execute(task: StopTaskDTO) : Promise<TaskResponse>
+    }
+  }
+
+  ' ════════════════════════════════════════════════════════════
+  ' APPLICATION - Port Out (Output)
+  ' ════════════════════════════════════════════════════════════
+  package "ports.out" #C8E6C9 {
+
+    interface ITaskRepository {
+      + create(task: CreateTaskDTO) : Promise<Task>
+      + update(task: UpdateTaskDTO) : Promise<Task>
+      + remove(taskId: string) : Promise<boolean>
+      + findAll() : Promise<Task[]>
+      + findOneById(taskId: string) : Promise<Task | null>
+    }
+  }
+
+  ' ════════════════════════════════════════════════════════════
+  ' APPLICATION - Use Cases
+  ' ════════════════════════════════════════════════════════════
+  package "use-cases" #A5D6A7 {
+
+    class CreateTask {
+      - <<readonly>> repository : ITaskRepository
+      + execute(task: CreateTaskDTO) : Promise<TaskResponse>
+    }
+
+    class FindTasks {
+      - <<readonly>> repository : ITaskRepository
+      + execute() : Promise<TaskResponse[]>
+    }
+
+    class FindTaskById {
+      - <<readonly>> repository : ITaskRepository
+      + execute(taskId: string) : Promise<TaskResponse | null>
+    }
+
+    class CompleteTask {
+      - <<readonly>> repository : ITaskRepository
+      + execute(task: CompleteTaskDTO) : Promise<TaskResponse>
+    }
+
+    class StartTask {
+      - <<readonly>> repository : ITaskRepository
+      + execute(task: StartTaskDTO) : Promise<TaskResponse>
+    }
+
+    class StopTask {
+      - <<readonly>> repository : ITaskRepository
+      + execute(task: StopTaskDTO) : Promise<TaskResponse>
+    }
+  }
+}
+
+' ══════════════════════════════════════════════════════════════
+' INFRASTRUCTURE
+' ══════════════════════════════════════════════════════════════
+package "infrastructure" #E8EAF6 {
+
+  package "adapters.out" #C5CAE9 {
+    class TaskRepository {
+      - data : Task[]
+      + create(dto: CreateTaskDTO) : Promise<Task>
+      + update(dto: UpdateTaskDTO) : Promise<Task>
+      + remove(taskId: string) : Promise<boolean>
+      + findAll() : Promise<Task[]>
+      + findOneById(taskId: string) : Promise<Task | null>
+    }
+  }
+
+  package "adapters.in" #C5CAE9 {
+    class ConsoleAdapter {
+      - <<readonly>> createTaskUseCase : ICreateTask
+      - <<readonly>> completeTaskUseCase : ICompleteTask
+      - <<readonly>> startTaskUseCase : IStartTask
+      - <<readonly>> stopTaskUseCase : IStopTask
+      - <<readonly>> findTasksUseCase : IFindTasks
+      - <<readonly>> findTaskByIdUseCase : IFindTaskById
+      --
+      + run() : Promise<void>
+      + exit(code?: number) : void
+    }
+  }
+}
+
+' ══════════════════════════════════════════════════════════════
+' RELATIONS
+' ══════════════════════════════════════════════════════════════
+
+' Use Cases implementent les Ports In
+CreateTask .up.|> ICreateTask
+FindTasks .up.|> IFindTasks
+FindTaskById .up.|> IFindTaskById
+CompleteTask .up.|> ICompleteTask
+StartTask .up.|> IStartTask
+StopTask .up.|> IStopTask
+
+' Use Cases dependent du Port Out
+CreateTask --> ITaskRepository
+FindTasks --> ITaskRepository
+FindTaskById --> ITaskRepository
+CompleteTask --> ITaskRepository
+StartTask --> ITaskRepository
+StopTask --> ITaskRepository
+
+' TaskRepository implemente ITaskRepository (Dependency Inversion)
+TaskRepository .up.|> ITaskRepository
+
+' ConsoleAdapter depend des Ports In
+ConsoleAdapter --> ICreateTask
+ConsoleAdapter --> ICompleteTask
+ConsoleAdapter --> IStartTask
+ConsoleAdapter --> IStopTask
+ConsoleAdapter --> IFindTasks
+ConsoleAdapter --> IFindTaskById
+
+' Domain dependencies
+ITaskRepository ..> Task : <<returns>>
+ITaskRepository ..> CreateTaskDTO : <<uses>>
+ITaskRepository ..> UpdateTaskDTO : <<uses>>
+
+' ══════════════════════════════════════════════════════════════
+' LEGENDE
+' ══════════════════════════════════════════════════════════════
+legend bottom right
+  |= Symbole |= Signification |
+  | ──▶ | Dependance |
+  | ──▷ | Implementation |
+  | ──▷ (pointille) | Retourne / Utilise |
+  --
+  |<#FFF3E0>| Domain |
+  |<#E8F5E9>| Application |
+  |<#E8EAF6>| Infrastructure |
+end legend
+
+@enduml
