@@ -1,17 +1,16 @@
 import type { TaskStatus } from "./TaskStatus";
 
 export class Task {
-  public readonly id: string;
-
   constructor(
     public content: string,
-    public status: TaskStatus = "TODO"
+    public status: TaskStatus = "TODO",
+    public readonly id?: string
   ) {
     if (!content || content === "") {
       throw new Error("Task content must be completed");
     }
 
-    this.id = Bun.randomUUIDv7();
+    if (this.id === undefined) this.id = Bun.randomUUIDv7();
   }
 
   markAsCompleted(): void {

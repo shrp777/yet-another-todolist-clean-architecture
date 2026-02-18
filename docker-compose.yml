@@ -3,6 +3,8 @@ name: "todolist"
 services:
   app:
     container_name: app
+    stdin_open: true
+    tty: true
     ports:
       - "3000:3000"
     build:
@@ -28,6 +30,8 @@ services:
     image: mariadb
     env_file:
       - ./db/.env
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s

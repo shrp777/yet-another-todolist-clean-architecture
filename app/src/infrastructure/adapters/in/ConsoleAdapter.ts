@@ -1,4 +1,5 @@
 import type { CreateTaskDTO } from "@application/dtos/CreateTaskDTO";
+import type { TaskResponse } from "@application/dtos/TaskResponse";
 import type { ICompleteTask } from "@application/ports/in/ICompleteTask";
 import type { ICreateTask } from "@application/ports/in/ICreateTask";
 import type { IFindTaskById } from "@application/ports/in/IFindTaskById";
@@ -16,15 +17,9 @@ export class ConsoleAdapter {
     private readonly findTaskByIdUseCase: IFindTaskById
   ) {}
 
-  exit(code: number = 1): void {
-    process.exit(code);
-  }
-
   async run(): Promise<void> {
-    const action: string | undefined = process.argv[2];
+    const action: string | undefined = process.argv[2] ?? "wait";
     const arg: string | undefined = process.argv[3];
-
-    if (!action) process.exit(0);
 
     switch (action) {
       case "create":
@@ -66,8 +61,12 @@ export class ConsoleAdapter {
         console.log(await this.findTasksUseCase.execute());
         break;
 
+      case "wait":
+        console.log("Wait...");
+        break;
+
       default:
-        this.exit(0);
+        process.exit(1);
         break;
     }
   }
